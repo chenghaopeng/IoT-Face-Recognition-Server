@@ -1,3 +1,5 @@
 .history
 .VSCounter
 faces
+tmp
+__pycache__
