@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  face_server:
+    image: registry.chper.cn/face_recognition
+    ports:
+      - "9000:5000"
+    volumes:
+      - .:/app
+    command: bash /app/startup.sh
