@@ -1,6 +1,7 @@
 from recognition import *
 from flask import Flask, request
 import os
+from util import *
 
 app = Flask('iot')
 
@@ -12,11 +13,15 @@ def index(file=None):
 @app.route('/upload', methods=['POST'])
 def upload():
     image = request.files.get('image')
-    img_path = './tmp/' + image.filename
+    ext = image.filename.rsplit('.', 1)
+    filename = random_alpha_string()
+    if len(ext) > 1:
+        filename += '.' + ext[-1]
+    img_path = './tmp/' + filename
     image.save(img_path)
     res = recognite(img_path)
     os.remove(img_path)
-    return res
-    
+    return str(res)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

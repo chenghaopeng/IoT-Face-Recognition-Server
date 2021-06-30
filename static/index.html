@@ -9,13 +9,18 @@
 </head>
 <body>
   <div id="root">
-    {{ message }}
+    <img :src="src" />
   </div>
   <script>
     new Vue({
       el: '#root',
       data: {
-        message: 'hello'
+        src: ''
+      },
+      created () {
+        setInterval(() => {
+          this.src = '/image.jpg?t=' + Math.random()
+        }, 100)
       }
     })
   </script>
