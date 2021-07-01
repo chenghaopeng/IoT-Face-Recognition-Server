@@ -9,6 +9,10 @@ import shutil
 import base64
 from PIL import Image
 import json
+import logging
+
+log = logging.getLogger('werkzeug')
+log.disabled = not DEBUG
 
 app = Flask('iot')
 image_queue = mp.Queue()

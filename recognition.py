@@ -59,8 +59,10 @@ def recognite(img):
         pil_image.save(os.path.join(TEMP_PATH, 'image.jpg'))
     except:
         print_flush('recognite error!!!')
-    if len(result) == 0 and has_unknown:
-        return [{'id': '-1', 'name': 'unknown'}]
+    if len(result) == 0:
+        if has_unknown:
+            return [{'id': '-1', 'name': 'unknown'}]
+        return [{'id': '0', 'name': None}]
     return result
 
 load_faces()
