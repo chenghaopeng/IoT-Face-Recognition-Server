@@ -1,18 +1,25 @@
 from recognition import *
-from flask import Flask, request
+from flask import Flask, request, make_response, send_from_directory
 import os
 from util import *
 from config import *
 import requests
 import multiprocessing as mp
+import shutil
 
 app = Flask('iot')
 image_queue = mp.Queue()
 result_queue = mp.Queue()
 
+if os.path.exists(TEMP_PATH):
+    shutil.rmtree(TEMP_PATH)
+os.mkdir(TEMP_PATH)
+
 @app.route('/', methods=['GET'])
 @app.route('/<string:file>', methods=['GET'])
 def index(file=None):
+    if file == 'image.jpg':
+        return make_response(send_from_directory('./tmp', 'image.jpg'))
     return app.send_static_file(file if file else 'index.html')
 
 @app.route('/upload', methods=['POST'])

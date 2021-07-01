@@ -3,6 +3,7 @@ from util import print_flush
 import face_recognition
 from PIL import Image, ImageDraw
 import numpy as np
+from config import TEMP_PATH
 
 FACE_PATH = 'faces'
 ALLOW_EXT = ['jpg', 'jpeg', 'png']
@@ -49,7 +50,7 @@ def recognite(img):
             _, text_height = draw.textsize(name)
             draw.rectangle(((left, bottom - text_height - 10), (right, bottom)), fill=(0, 0, 255), outline=(0, 0, 255))
             draw.text((left + 6, bottom - text_height - 5), name, fill=(255, 255, 255, 255))
-        pil_image.save('./static/image.jpg')
+        pil_image.save(os.path.join(TEMP_PATH, 'image.jpg'))
     except:
         print_flush('recognite error!!!')
     return result
