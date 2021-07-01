@@ -59,9 +59,28 @@ def image_recognite(image_queue: mp.Queue, result_queue: mp.Queue):
         print_flush(res)
 
 def result_upload(result_queue: mp.Queue):
+    nobody = True
+    nobody_count = 0
     while True:
         if result_queue.empty(): continue
         id = result_queue.get()
+        if int(id) == 0:
+            if nobody:
+                pass
+            else:
+                nobody_count += 1
+                print_flush(f'nobody count = {nobody_count}')
+                if nobody_count == 5:
+                    print_flush(f'set nobody')
+                    nobody = True
+                    nobody_count = 0
+                else:
+                    print_flush(f'ignore')
+                    continue
+        else:
+            nobody = False
+            nobody_count = 0
+        print_flush(f'upload result id: {id}')
         data = {'Int64': id}
         try:
             res = requests.put(EDGEX_URL, data=json.dumps(data), timeout=2000, headers={'content-type': 'application/json'})
