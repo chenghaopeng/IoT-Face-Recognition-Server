@@ -48,7 +48,7 @@ def recognite(img):
                     best_match_index = np.argmin(face_distances)
                     if matches[best_match_index]:
                         result.append(known_infos[best_match_index])
-                        name = known_infos[best_match_index]['id']
+                        name = known_infos[best_match_index]['name']
                 if not name:
                     name = 'unknown'
                     has_unknown = True
