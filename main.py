@@ -6,6 +6,9 @@ from config import *
 import requests
 import multiprocessing as mp
 import shutil
+import base64
+from PIL import Image
+import json
 
 app = Flask('iot')
 image_queue = mp.Queue()
@@ -24,14 +27,18 @@ def index(file=None):
 
 @app.route('/upload', methods=['POST'])
 def upload():
+    data = request.get_json()
     try:
-        image = request.files.get('image')
-        ext = image.filename.rsplit('.', 1)
-        filename = random_alpha_string()
-        if len(ext) > 1:
-            filename += '.' + ext[-1]
+        image = data.get('image')
+        filename = random_alpha_string() + '.jpg'
         img_path = './tmp/' + filename
-        image.save(img_path)
+        with open(img_path, 'wb') as f:
+            f.write(base64.b64decode(image))
+        im = Image.open(img_path)
+        k = 0.5
+        x, y = im.size
+        out = im.resize((int(x * k), int(y * k)), Image.ANTIALIAS)
+        out.save(img_path, quality=100)
         image_queue.put(img_path)
         return {'success': True}
     except:
@@ -53,8 +60,7 @@ def result_upload(result_queue: mp.Queue):
         id = result_queue.get()
         data = {'Int64': id}
         try:
-            res = requests.put(EDGEX_URL, data=data, timeout=2000)
-            print_flush(res.status_code)
+            res = requests.put(EDGEX_URL, data=json.dumps(data), timeout=2000, headers={'content-type': 'application/json'})
         except:
             print_flush('result upload error!!!')
 

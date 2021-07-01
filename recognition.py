@@ -32,27 +32,35 @@ def load_faces():
 
 def recognite(img):
     result = []
+    has_unknown = False
     try:
         image = face_recognition.load_image_file(img)
         locations = face_recognition.face_locations(image)
-        face = face_recognition.face_encodings(image, locations)
         pil_image = Image.fromarray(image)
-        draw = ImageDraw.Draw(pil_image)
-        for (top, right, bottom, left), face_encoding in zip(locations, face):
-            matches = face_recognition.compare_faces(known_faces, face_encoding, tolerance=0.5)
-            name = 'unknown'
-            face_distances = face_recognition.face_distance(known_faces, face_encoding)
-            best_match_index = np.argmin(face_distances)
-            if matches[best_match_index]:
-                result.append(known_infos[best_match_index])
-                name = known_infos[best_match_index]['id']
-            draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255))
-            _, text_height = draw.textsize(name)
-            draw.rectangle(((left, bottom - text_height - 10), (right, bottom)), fill=(0, 0, 255), outline=(0, 0, 255))
-            draw.text((left + 6, bottom - text_height - 5), name, fill=(255, 255, 255, 255))
+        if len(locations) > 0:
+            face = face_recognition.face_encodings(image, locations)
+            draw = ImageDraw.Draw(pil_image)
+            for (top, right, bottom, left), face_encoding in zip(locations, face):
+                matches = face_recognition.compare_faces(known_faces, face_encoding, tolerance=0.5)
+                name = None
+                face_distances = face_recognition.face_distance(known_faces, face_encoding)
+                if len(face_distances) > 0:
+                    best_match_index = np.argmin(face_distances)
+                    if matches[best_match_index]:
+                        result.append(known_infos[best_match_index])
+                        name = known_infos[best_match_index]['id']
+                if not name:
+                    name = 'unknown'
+                    has_unknown = True
+                draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255))
+                _, text_height = draw.textsize(name)
+                draw.rectangle(((left, bottom - text_height - 10), (right, bottom)), fill=(0, 0, 255), outline=(0, 0, 255))
+                draw.text((left + 6, bottom - text_height - 5), name, fill=(255, 255, 255, 255))
         pil_image.save(os.path.join(TEMP_PATH, 'image.jpg'))
     except:
         print_flush('recognite error!!!')
+    if len(result) == 0 and has_unknown:
+        return [{'id': '-1', 'name': 'unknown'}]
     return result
 
 load_faces()
