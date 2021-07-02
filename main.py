@@ -81,9 +81,9 @@ def result_upload(result_queue: mp.Queue):
             nobody = False
             nobody_count = 0
         print_flush(f'upload result id: {id}')
-        data = {'Int64': id}
+        data = {'device': 'atlas200dk', 'readings': [{'name': 'facial_identification', 'value': id}]}
         try:
-            res = requests.put(EDGEX_URL, data=json.dumps(data), timeout=2000, headers={'content-type': 'application/json'})
+            res = requests.post(EDGEX_URL, data=json.dumps(data), timeout=2000, headers={'content-type': 'application/json'})
         except:
             print_flush('result upload error!!!')
 
